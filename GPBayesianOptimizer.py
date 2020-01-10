@@ -7,10 +7,24 @@ def inputFunction(x:float)->float:
     return 10. + (-1. * x**(4.) * 2.0*np.sin(2.*np.pi*4.*x))
 
 def MorletWavelet(x:float)->float:
+    """
+        Returns the value of a Morlet Wavelet evaluated at x
+
+    :param x: the input value at which to evaluate the Morlet Wavelet Function
+    """
     return (1./np.sqrt(2.*np.pi*4.0))*np.exp(-x**2./4.0) * 2.0*np.sin(2.*np.pi*1.*x)
 
-
 def bayesOpt(inputs:np.ndarray, outputs:np.ndarray, func:Callable, theta_d:np.ndarray, maximize:bool=True):
+    """
+        Function which performs bayesian optimization using Gaussian Processes and
+        the CMA-ES optimization algorithm.
+
+    :param inputs: a NumPy array containing the previously explored values of the objective function.
+    :param outputs: the values of the objective function evaluated at each input value.
+    :param func: the objective function.
+    :param theta_d: hyperparameter for the Gaussian Process.
+    :param maximize: indicate whether the objective function should be maximized (True) or minimized (False).
+    """
     if len(inputs.shape) < 2: inputs = np.expand_dims(inputs, -1)
     kernel = np.hstack([inputs.reshape(inputs.shape[0],1,inputs.shape[1])] * inputs.shape[0])
     kernelT = np.transpose(kernel, (1,0,2))
