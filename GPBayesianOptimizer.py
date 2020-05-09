@@ -1,9 +1,10 @@
-import cma
 import numpy as np
 import time
 from typing import Callable
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import pyplot as plt
+
+from cmaes import CMAES
 
 def inputFunction(x:float)->float:
     return 10. + (-1. * x**(4.) * 2.0*np.sin(2.*np.pi*4.*x))
@@ -74,17 +75,18 @@ def bayesOpt(inputs:np.ndarray, outputs:np.ndarray, func:Callable, theta_d:np.nd
             return UCB
 
         #run CMA-ES to find maximum of the GP
-        es = cma.CMAEvolutionStrategy(inputs[np.argmax(outputs)], 0.1)
-        for _ in range(0, 1000):
-            new_xs = es.ask()
-            # print(new_xs)
-            new_outputs = [kernelFunc(x) for x in new_xs]
-            # print(new_outputs)
-            if maximize: new_outputs = [-x for x in new_outputs]
-            es.tell(new_xs, new_outputs)
+        bestX = CMAES(inputs[np.argmax(outputs)], 0.1, 100, kernelFunc, None, False)
+        # es = cma.CMAEvolutionStrategy(inputs[np.argmax(outputs)], 0.1)
+        # for _ in range(0, 1000):
+        #     new_xs = es.ask()
+        #     # print(new_xs)
+        #     new_outputs = [kernelFunc(x) for x in new_xs]
+        #     # print(new_outputs)
+        #     if maximize: new_outputs = [-x for x in new_outputs]
+        #     es.tell(new_xs, new_outputs)
 
-        inputs = np.vstack((inputs, es.best.x))
-        outputs = np.hstack((outputs, func(es.best.x)))
+        inputs = np.vstack((inputs, bestX))
+        outputs = np.hstack((outputs, func(bestX)))
         t+=1
     return inputs, outputs
 
